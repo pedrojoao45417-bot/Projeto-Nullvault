@@ -60,7 +60,6 @@ Bash
 pyinstaller cofre.spec
 O binário final estará disponível na pasta dist/.
 
-Desenvolvido por João 
 
 
 ---
