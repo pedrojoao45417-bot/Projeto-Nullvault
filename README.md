@@ -1,72 +1,89 @@
-# 🛡️ Nullvouts
-
-O **Nullvouts** é um aplicativo desktop seguro desenvolvido em Python para o gerenciamento e armazenamento local de senhas. Focado em privacidade e criptografia de ponta, o projeto foi construído para rodar de forma isolada, garantindo que dados confidenciais fiquem protegidos contra interceptações, telemetria e acessos indesejados.
-
----
-
-## 🔒 Funcionamento 100% Offline (Air-Gapped)
-
-Uma das premissas arquiteturais mais fundamentais do Nullvouts é o seu **isolamento total de rede**:
-* **Zero Conexões Externas:** O aplicativo não realiza requisições HTTP, chamadas de API ou comunicação com servidores de terceiros.
-* **Sem Telemetria ou Nuvem:** Nenhum dado, log ou metadado é enviado para a internet. Seus segredos pertencem exclusivamente ao seu dispositivo.
-* **Armazenamento 100% Local:** Todo o cofre criptografado reside estritamente no seu sistema de arquivos local, garantindo total soberania e segurança dos seus dados mesmo em ambientes sem acesso à internet.
-
----
-
-## 🚀 Principais Funcionalidades e Arquitetura de Segurança
-
-* **Criptografia Robusta:** Utiliza **AES-256-GCM** para a criptografia dos dados do cofre.
-* **Derivação de Chaves Avançada:** Implementação de **Scrypt** (`N_LOG2 = 19`) para proteger a chave mestra contra ataques de força bruta.
-* **Proteção contra Captura de Tela:** Utiliza a API `WDA_EXCLUDEFROMCAPTURE` para impedir que softwares maliciosos tirem prints da janela do aplicativo.
-* **Autenticação por Keyfile:** Suporte opcional a arquivos de chave personalizados para reforçar o acesso ao cofre.
-* **Limpeza Automática de Clipboard:** O conteúdo copiado da área de transferência é limpo automaticamente após um período de inatividade.
-* **Interface Moderna:** Tema escuro (dark theme) elegante e focado em usabilidade.
-
----
-
-## 🛠️ Tecnologias e Dependências Utilizadas
-
-* **Linguagem:** Python 3.14+
-* **Criptografia:** Biblioteca `cryptography` e `cffi`
-* **Interface Gráfica:** Tkinter / CustomTkinter (ou framework GUI equivalente)
-* **Empacotamento Standalone:** PyInstaller (modo `--onefile`)
-* **Ambiente de Desenvolvimento:** Linux Mint (WSL2 / Ubuntu-based)
-
----
-
-## 📝 Histórico de Correções e Configurações Realizadas
-
-1. **Dependência do Sistema (`objdump`):** Instalação do pacote `binutils` via gerenciador de pacotes (`sudo apt install binutils`).
-2. **Resolução de Caminhos no WSL:** Correção de erros de espaços em caminhos do Windows (`/mnt/c/Users/pedro/Projeto ZeroKnow`) usando aspas duplas.
-3. **Biblioteca Compartilhada do Python (`libpython3.14.so.1.0`):** Instalação de `python3.14-dev` e recriação do `venv` com `--system-site-packages`.
-4. **Módulo Oculto (`cryptography`):** Configuração explícita de `hiddenimports` no arquivo `cofre.spec` para garantir que a criptografia funcione no executável compilado.
-5. **Empacotamento Standalone (`cofre.spec`):** Ajuste completo do script de especificação para gerar um binário portátil e único (`--onefile`).
-
----
-
-## ⚙️ Como Compilar o Projeto (PyInstaller)
-
-1. Navegue até a pasta do projeto no WSL:
-   ```bash
-   cd "/mnt/c/Users/pedro/Projeto ZeroKnow"
-Ative o ambiente virtual e instale as dependências:
-
-Bash
-source ~/Nullvouts/venv/bin/activate
+Nullvault
+Gerenciador de senhas desktop, 100% offline, com cofre criptografado em AES-256-GCM, derivação de chave Scrypt de 512 MB e proteção contra captura de tela. Zero rede, zero telemetria, zero nuvem.
+O Nullvault é um aplicativo em Python com interface gráfica em Tkinter e modo terminal. Ele foi desenhado para que o cofre fique protegido mesmo se alguém roubar o arquivo, copiar a memória ou espiar a tela.
+Principais recursos
+• 100% offline: o código não abre nenhuma conexão de rede. Tudo roda e fica na sua máquina.
+• Criptografia AES-256-GCM: cifra autenticada, que além de esconder os dados detecta qualquer alteração no arquivo.
+• Scrypt com 512 MB de RAM por tentativa: cada palpite de senha custa caro, o que inviabiliza ataques por GPU.
+• Envelope multi-slot (formato v4): uma chave de dados aleatória é embrulhada em vários slots. Senha Infra, Keyfile e Segunda Senha abrem o cofre por caminhos diferentes.
+• Keyfile em pendrive: arquivo de 64 bytes aleatórios que funciona como segundo fator físico. O app detecta o pendrive sozinho.
+• Segunda Senha de recuperação: se você perder o pendrive, entra com a Senha Infra mais a Segunda Senha. Ela também passa por Scrypt de 512 MB.
+• Proteção contra captura de tela: a janela fica invisível para programas de screenshot e gravação no Windows.
+• Área de transferência protegida: o segredo copiado é excluído do histórico do Windows e da nuvem, e some sozinho depois de 15 segundos.
+• Segredos protegidos na RAM: cada item fica cifrado individualmente na memória, com buffers travados contra swap e zerados após o uso.
+• Bloqueio por inatividade: após 5 minutos parado, o cofre é regravado, apagado da RAM e a sessão trava.
+• Anti-força-bruta: espera crescente a cada senha errada, com bloqueio mínimo de 5 minutos a partir da quinta falha.
+• Anti-rollback: detecta se alguém restaurou uma cópia antiga do cofre.
+• Auditoria encadeada: registro com hash em cadeia e selo HMAC, que acusa qualquer entrada apagada ou alterada.
+• Gerador de senhas e frases: senhas aleatórias de 16 ou mais caracteres e frases de 6 palavras sorteadas entre 38.504 palavras de seis idiomas.
+• Compatibilidade: abre cofres das versões 0 a 3 e os migra para a versão 4 automaticamente.
+Instalação
+Requisitos
+• Python 3.10 ou superior.
+• Biblioteca cryptography.
+• Tkinter (já vem com o Python no Windows; no Linux, instale o pacote python3-tk).
+• Windows ou Linux. As proteções de tela, de clipboard e de barra de título são mais completas no Windows.
+A partir do código-fonte
+git clone https://github.com/JotaCyberKiK/Projeto-Nullvault.git
+cd Projeto-Nullvault
+python -m venv .venv
+# Windows: .venv\Scripts\activate   |   Linux: source .venv/bin/activate
 pip install cryptography
-Gere o executável com o PyInstaller:
-
-Bash
-pyinstaller cofre.spec
-O binário final estará disponível na pasta dist/.
-
-
-
----
-
-<ElicitationsGroup message="Para refinar ainda mais o seu projeto:">
-  <Elicitation label="Adicionar licença de uso ao README" query="Como adiciono uma licença MIT ou GPL ao README.md do Nullvouts?"/>
-  <Elicitation label="Criar script automatizado de build" query="Como crio um script Bash simples para automatizar a limpeza e a compilação do Nullvouts com PyInstaller?"/>
-</ElicitationsGroup>
-
-<FollowUp label="Quer que eu salve esse README atualizado diretamente para você?" query="Como posso salvar o novo conteúdo do README.md diretamente no diretório do projeto via terminal?"/>
+python Nullvouts.py
+Para abrir no terminal em vez da janela gráfica, use python Nullvouts.py --cli.
+Confirme o nome do arquivo principal no seu repositório. No código que você enviou ele aparece como Nullvouts.py.
+Início rápido
+1.  Abra o app. Na primeira execução ele pede para criar o cofre.
+2.  Defina a Senha Infra, com no mínimo 12 caracteres. Se preferir, gere uma frase aleatória.
+3.  Opcional: crie a Keyfile no pendrive e defina a Segunda Senha de recuperação.
+4.  Adicione seus itens. Cada um tem nome e segredo.
+5.  Para consultar, selecione o item. Você pode revelar na tela ou copiar por 15 segundos.
+6.  Ao terminar, clique em Bloquear Agora ou em Sair.
+Não existe recuperação da Senha Infra. Se você perder a senha e não tiver a Segunda Senha ou a Keyfile, ninguém consegue abrir o cofre, nem você.
+Como a segurança funciona
+Camada
+O que faz
+Para que serve
+AES-256-GCM
+Cifra o cofre e autentica o cabeçalho
+Esconde os dados e detecta adulteração
+Scrypt, N = 2^19 (512 MB)
+Deriva a chave a partir da Senha Infra
+Torna cada tentativa lenta e cara
+Envelope multi-slot
+Embrulha a chave de dados em até 3 slots
+Permite abrir por Keyfile, Segunda Senha ou ambas
+Keyfile de 64 bytes
+Segundo fator guardado no pendrive
+Sem o arquivo, a senha sozinha não basta
+Proteção de memória
+Trava buffers na RAM e zera após o uso
+Evita vazar segredo por swap ou dump de memória
+Anti-rollback
+Guarda âncora do cofre fora da pasta (DPAPI no Windows)
+Acusa a troca por uma cópia antiga
+Auditoria em cadeia
+Hash encadeado e selo HMAC por entrada
+Acusa qualquer registro removido ou editado
+Captura de tela
+Exclui a janela da captura
+Impede screenshot e gravação do cofre aberto
+O que o Nullvault garante
+• O cofre em disco fica sempre cifrado, e o cabeçalho inteiro é autenticado.
+• Nenhum dado sai da máquina, porque não há código de rede.
+• Os nomes dos itens no registro de auditoria aparecem só como impressão digital HMAC, nunca em texto puro.
+• Em caso de erro, o app exige a espera crescente antes de nova tentativa, e esse contador sobrevive a reinícios.
+O que o Nullvault não faz
+• Não protege contra malware com acesso total ao seu computador enquanto o cofre está aberto.
+• Não recupera uma Senha Infra esquecida.
+• Não sincroniza entre dispositivos, de propósito.
+• A exclusão segura por sobrescrita não é garantida em SSD ou em sistemas de arquivos com journaling.
+Verificações automáticas do repositório
+O repositório usa GitHub Actions para manter o código seguro: Bandit e Semgrep para análise estática, CodeQL para análise de código, Gitleaks para detecção de segredos, OpenSSF Scorecard para boas práticas e Dependabot para dependências vulneráveis.
+Desenvolvimento
+git clone https://github.com/JotaCyberKiK/Projeto-Nullvault.git
+cd Projeto-Nullvault
+pip install cryptography bandit
+bandit -r .
+Licença
+Escolha uma licença, por exemplo MIT ou Apache 2.0, e adicione o arquivo LICENSE. do README.md diretamente no diretório do projeto via terminal?"/>
