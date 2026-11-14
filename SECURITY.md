@@ -1,35 +1,40 @@
 # Security Policy
 
-## Supported Versions
+At **Nullvouts**, security, privacy, and data sovereignty are our absolute highest priorities. Because this application is designed for local, offline credential management, our threat model places you—the user—as the sole custodian of your cryptographic keys and data.
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+---
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+## 🔒 Core Security Principles
 
-## Reporting a Vulnerability
+* **100% Offline (Air-Gapped):** Nullvouts contains zero networking code, telemetry, analytics, or external API calls. Your data never leaves your local file system.
+* **Zero-Knowledge Architecture:** There is no cloud backend, account server, or central database. We have zero access to your master key, keyfiles, or stored credentials.
+* **Self-Custody Responsibility:** Because there are no servers, there is no "Password Reset" mechanism. If you lose your master key or keyfile and lack a backup, **your data cannot be recovered**.
 
-Use this section to tell people how to report a vulnerability.
+---
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+## 🛠️ Cryptographic & Protection Stack
 
-# Política de segurança do Nullvaut
+Nullvouts implements industry-standard cryptographic primitives and platform-level security measures:
 
-## Versões com suporte
+* **Encryption:** Data is secured using **AES-256-GCM** (Galois/Counter Mode), providing both confidentiality and cryptographic integrity.
+* **Key Derivation:** Master passwords are processed through **Scrypt** (`N_LOG2 = 19`), making brute-force and hardware acceleration attacks computationally expensive.
+* **Anti-Screenshot Protection:** Integrates platform-level API protection (`WDA_EXCLUDEFROMCAPTURE`) to prevent malicious screen-scraping tools or background malware from capturing sensitive window contents.
+* **Memory & Clipboard Hygiene:** Sensitive credentials stored in the clipboard are automatically cleared after a set period of inactivity to minimize memory exposure windows.
 
-As correções de segurança são destinadas à versão publicada mais recente do Nullvaut, disponível na seção **Releases** deste repositório.
+---
 
-## Como relatar uma vulnerabilidade
+## 📂 Backup & User Custody Warning
 
-Abra **Segurança e qualidade → Avisos → Relatar uma vulnerabilidade** para enviar um relato privado pelo GitHub.
+Because Nullvouts operates entirely offline without cloud synchronization:
+1. **You are responsible for your own backups.** We strongly recommend periodically copying your encrypted vault file to secure external media (such as an encrypted USB flash drive).
+2. **Corrupted or lost files** resulting from hardware failure cannot be restored by us. Always keep offline redundancies of your critical vault files.
 
-Inclua a versão do Nullvaut, o sistema operacional, os passos para reproduzir o problema e o possível impacto. Use um cofre de teste e dados fictícios nos exemplos e anexos.
+---
 
-Mantenha os detalhes no relato privado enquanto o problema estiver em análise. Se forem necessárias mais informações, a conversa pode continuar pelo próprio GitHub.
+## 🛡️ Reporting a Vulnerability
+
+If you discover a security vulnerability or cryptographic flaw within Nullvouts, we take it extremely seriously. 
+
+* **Please do not open public GitHub issues** for security vulnerabilities.
+* Instead, please report vulnerabilities directly through private communication channels (or by reaching out to the project maintainer privately). 
+* Include a detailed description of the issue, steps to reproduce, and potential impact. We will review and address valid security reports promptly.
